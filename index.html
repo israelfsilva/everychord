@@ -6,8 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="OpenChords: Utilitário desktop-first com motor combinatório puro de acordes, heurística biomecânica de digitação e síntese de áudio Tone.js." />
     <title>OpenChords • Motor Combinatório de Voicings</title>
+    <script>
+      // Apply saved/system theme before first paint (see src/lib/theme.ts)
+      (function () {
+        var theme = 'dark';
+        try {
+          var stored = localStorage.getItem('openchords-theme');
+          if (stored === 'light' || stored === 'dark') theme = stored;
+          else if (window.matchMedia('(prefers-color-scheme: light)').matches) theme = 'light';
+        } catch (e) {}
+        document.documentElement.classList.toggle('dark', theme === 'dark');
+      })();
+    </script>
   </head>
-  <body class="bg-neutral-950 text-neutral-100 font-mono antialiased overflow-hidden">
+  <body class="overflow-hidden">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

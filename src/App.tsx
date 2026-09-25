@@ -5,7 +5,7 @@ import { BottomConsole } from './components/BottomConsole';
 
 export function App() {
   return (
-    <div className="flex h-screen w-screen flex-col overflow-hidden bg-neutral-950 text-neutral-100 antialiased font-mono">
+    <div className="flex h-screen w-screen flex-col overflow-hidden bg-background text-foreground antialiased">
       {/* 1. Header Bar */}
       <HeaderBar />
 

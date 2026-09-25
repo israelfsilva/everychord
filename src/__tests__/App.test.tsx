@@ -1,8 +1,16 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import App from '../App';
+import { useChordStore } from '../store/chord-store';
+import { THEME_STORAGE_KEY } from '../lib/theme';
 
 describe('OpenChords Application Integration', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    document.documentElement.classList.remove('dark');
+    useChordStore.getState().setConstraints({ noBarre: false });
+  });
+
   it('renders application header, chord selector, diagram grid and console', () => {
     render(<App />);
 
@@ -24,9 +32,9 @@ describe('OpenChords Application Integration', () => {
     expect(screen.getAllByLabelText(/Diagrama de acorde/i).length).toBeGreaterThan(0);
 
     // Bottom console
-    expect(screen.getByText(/Voicing Selecionado/i)).toBeDefined();
-    expect(screen.getByText(/Afinação por Corda/i)).toBeDefined();
-    expect(screen.getByText(/Filtros & Ergonomia/i)).toBeDefined();
+    expect(screen.getByRole('heading', { level: 2, name: /^Voicing$/ })).toBeDefined();
+    expect(screen.getByRole('heading', { level: 2, name: /^Afinação$/ })).toBeDefined();
+    expect(screen.getByRole('heading', { level: 2, name: /^Filtros$/ })).toBeDefined();
   });
 
   it('updates chord when user clicks a different root and modifier', () => {
@@ -58,5 +66,50 @@ describe('OpenChords Application Integration', () => {
     fireEvent.click(submitBtn);
 
     expect(screen.getAllByText('D7').length).toBeGreaterThan(0);
+  });
+
+  it('toggles theme on <html> and persists the choice', () => {
+    render(<App />);
+
+    // jsdom has no matchMedia and storage is empty: defaults to dark
+    expect(document.documentElement.classList.contains('dark')).toBe(true);
+
+    const themeButton = screen.getByRole('button', { name: /Alternar tema/i });
+    fireEvent.click(themeButton);
+    expect(document.documentElement.classList.contains('dark')).toBe(false);
+    expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe('light');
+
+    fireEvent.click(themeButton);
+    expect(document.documentElement.classList.contains('dark')).toBe(true);
+    expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe('dark');
+  });
+
+  it('restores a saved light theme on load', () => {
+    localStorage.setItem(THEME_STORAGE_KEY, 'light');
+    render(<App />);
+    expect(document.documentElement.classList.contains('dark')).toBe(false);
+  });
+
+  it('focuses the quick search with Cmd+K / Ctrl+K', () => {
+    render(<App />);
+    const searchInput = screen.getByPlaceholderText(/Busca rápida/i);
+
+    fireEvent.keyDown(window, { key: 'k', metaKey: true });
+    expect(document.activeElement).toBe(searchInput);
+
+    searchInput.blur();
+    fireEvent.keyDown(window, { key: 'K', ctrlKey: true });
+    expect(document.activeElement).toBe(searchInput);
+  });
+
+  it('updates the no-barre filter through its switch', () => {
+    render(<App />);
+    const noBarreSwitch = screen.getByRole('switch', { name: /Sem Pestanas/i });
+
+    fireEvent.click(noBarreSwitch);
+    expect(useChordStore.getState().constraints.noBarre).toBe(true);
+
+    fireEvent.click(noBarreSwitch);
+    expect(useChordStore.getState().constraints.noBarre).toBe(false);
   });
 });
