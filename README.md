@@ -1,52 +1,58 @@
 # OpenChords
 
-> Todas as formas de tocar um acorde no violão, na guitarra ou no baixo, em qualquer afinação. Veja os diagramas, ouça cada posição e escolha a mais confortável para a sua mão.
+> Every way to play a chord on guitar or bass, in any tuning. See the diagrams, hear each voicing, and pick the one that fits your hand best.
 
-**Acesse:** https://israelfsilva.github.io/openchords/
+**Try it:** https://israelfsilva.github.io/openchords/
 
-Inspirado no clássico "Billion Chords".
+Inspired by the classic "Billion Chords".
 
----
-
-## 🎸 O que dá pra fazer
-
-- **Achar qualquer acorde:** escolha a fundamental e o sufixo (maior, menor, dominante, sus…) ou digite direto na busca (`F#m7`, `Bb9`, `Cadd9`). Atalho: ⌘K / Ctrl+K.
-- **Ver todas as posições:** cada forma aparece como diagrama, com dedilhado sugerido, pestana, cordas soltas e abafadas, tablatura (`X32010`) e uma indicação de dificuldade (Fácil, Média, Difícil).
-- **Ouvir antes de tocar:** clique num diagrama para ouvir o acorde dedilhado, ou numa bolinha para ouvir só aquela nota.
-- **Enxergar o braço inteiro:** o braço mostra a posição escolhida e onde estão todas as notas do acorde até a casa que você definir.
-- **Tocar na sua afinação:** Standard, Drop D, DADGAD, Open G, Open D, baixo de 4 cordas ou uma afinação sua, corda por corda.
-- **Filtrar pelo que cabe na mão:** distância máxima entre casas, até qual casa procurar, sem pestana, só acordes fáceis, omitir 3ª ou 5ª e permitir inversões.
-- **Modo canhoto** e **tema claro/escuro**.
-
-## ⚙️ Como funciona
-
-Os acordes não vêm de uma tabela pronta: o app calcula no próprio navegador todas as combinações de casas que formam o acorde na afinação escolhida. Depois descarta as que a mão não alcança, sugere quais dedos usar e ordena as posições da mais fácil para a mais difícil. Por isso funciona com qualquer afinação, sem servidor.
+![OpenChords screenshot](docs/screenshot.png)
 
 ---
 
-## 🛠️ Stack Tecnológica
+## 🎸 Features
+
+- **Find any chord:** pick a root and a suffix (major, minor, dominant, sus…) or type it into the search (`F#m7`, `Bb9`, `Cadd9`). Shortcut: ⌘K / Ctrl+K.
+- **See every voicing:** each shape is shown as a diagram with suggested fingering, barre, open and muted strings, tab notation (`X32010`) and a difficulty rating (Easy, Medium, Hard).
+- **Hear it before you play it:** click a diagram to hear the chord strummed, or click a dot to hear just that note.
+- **See the whole fretboard:** the neck shows the selected voicing and where every chord tone sits, up to the fret you choose.
+- **Play in your tuning:** Standard, Drop D, DADGAD, Open G, Open D, 4-string bass, or a custom tuning, string by string.
+- **Filter by what your hand can reach:** max fret span, highest fret to search, no barre, easy chords only, omit the 3rd or 5th, and allow inversions.
+- **Left-handed mode**, **light/dark theme**, and an interface in **English, Portuguese, and Spanish** (picked from your browser language, switchable in the header).
+
+## ⚙️ How it works
+
+Chords don't come from a lookup table: the app computes, right in the browser, every fret combination that forms the chord in the selected tuning. It then discards the ones a hand can't reach, suggests which fingers to use, and sorts the voicings from easiest to hardest. That's why it works with any tuning, with no server.
+
+---
+
+## 🛠️ Tech stack
 
 - **Framework:** React 19 + TypeScript + Vite
-- **Estilização:** Tailwind CSS v4 + Inter + JetBrains Mono
-- **Gerenciamento de Estado:** Zustand com Cache LRU
-- **Teoria Musical:** `@tonaljs/tonal`
-- **Áudio Web:** `Tone.js` (PolySynth acústico com envelope percussivo)
-- **Testes (TDD):** Vitest + Testing Library + jsdom
+- **Styling:** Tailwind CSS v4 + Inter + JetBrains Mono
+- **State management:** Zustand with an LRU cache
+- **Music theory:** `@tonaljs/tonal`
+- **Web audio:** `Tone.js` (acoustic PolySynth with a percussive envelope)
+- **Testing (TDD):** Vitest + Testing Library + jsdom
 
 ---
 
-## 📦 Scripts Disponíveis
+## 📦 Scripts
 
 ```bash
-# Iniciar o servidor de desenvolvimento
+# Start the dev server
 npm run dev
 
-# Executar a suíte completa de testes (TDD)
+# Run the full test suite
 npm run test:run
 
-# Executar os testes em modo watch
+# Run tests in watch mode
 npm run test
 
-# Gerar o bundle de produção
+# Build for production
 npm run build
 ```
+
+## 📄 License
+
+[MIT](LICENSE) © 2026 Israel Silva
