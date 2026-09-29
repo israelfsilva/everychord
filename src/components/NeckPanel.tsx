@@ -5,6 +5,7 @@ import { getChordDefinition, getFretNote } from '../core/fretboard';
 import { soundEngine } from '../audio/sound-engine';
 import { cn } from '@/lib/utils';
 import { MuteMark } from './MuteMark';
+import { useT } from '@/i18n';
 
 const NOTE_OPTIONS = [
   'C1', 'C#1', 'D1', 'D#1', 'E1', 'F1', 'F#1', 'G1', 'G#1', 'A1', 'A#1', 'B1',
@@ -29,6 +30,7 @@ export const NeckPanel: React.FC = () => {
     setTuningPreset,
     setStringTuning,
   } = useChordStore();
+  const t = useT();
 
   const numFrets = constraints.upToFret ?? 15;
   const numStrings = tuning.length;
@@ -88,40 +90,40 @@ export const NeckPanel: React.FC = () => {
 
   return (
     <section
-      aria-label="Braço"
+      aria-label={t.neck.title}
       className="flex min-w-0 flex-col gap-2 overflow-hidden rounded-oc border border-line bg-card px-3.5 pt-2.5"
     >
       {/* Header: label · hint · legend · tuning */}
       <div className="flex h-[26px] items-center gap-3">
-        <h2 className="eyebrow shrink-0">Braço</h2>
+        <h2 className="eyebrow shrink-0">{t.neck.title}</h2>
         <p className="hidden truncate text-xs text-muted xl:block">
-          Clique no diagrama para <span className="text-text">dedilhar</span> · clique na bolinha para{' '}
-          <span className="text-text">ouvir a nota</span>
+          {t.neck.hintClickDiagram} <span className="text-text">{t.neck.hintStrum}</span> · {t.neck.hintClickDot}{' '}
+          <span className="text-text">{t.neck.hintListen}</span>
         </p>
         <span className="flex-1" />
         <span className="hidden shrink-0 items-center gap-1.5 text-[11px] text-muted sm:flex">
           <span className="h-2.5 w-2.5 rounded-full bg-accent" />
-          voicing
+          {t.neck.legendVoicing}
         </span>
         <span className="hidden shrink-0 items-center gap-1.5 text-[11px] text-muted sm:flex">
           <span className="h-2.5 w-2.5 rounded-full border border-muted" />
-          notas do acorde
+          {t.neck.legendChordTones}
         </span>
         <label className="relative flex h-[26px] shrink-0 items-center gap-2.5 rounded-oc border border-line bg-bg pl-2.5 pr-7 text-xs transition-colors duration-120 focus-within:border-accent hover:border-muted">
-          <span className="text-muted">Afinação</span>
+          <span className="text-muted">{t.neck.tuning}</span>
           <select
             value={tuningPreset}
             onChange={(e) => setTuningPreset(e.target.value)}
-            aria-label="Preset de afinação"
+            aria-label={t.neck.tuningPreset}
             className="cursor-pointer appearance-none bg-transparent text-text outline-none"
           >
             {Object.values(TUNING_PRESETS).map((p) => (
               <option key={p.id} value={p.id}>
-                {p.name}
+                {t.neck.tuningNames[p.id] ?? p.name}
               </option>
             ))}
             <option value="custom" disabled={tuningPreset !== 'custom'}>
-              Customizada
+              {t.neck.custom}
             </option>
           </select>
           <ChevronDown className="pointer-events-none absolute right-2 h-3.5 w-3.5 text-muted" />
@@ -141,8 +143,8 @@ export const NeckPanel: React.FC = () => {
                     key={`tune-${s}`}
                     value={tuning[s]}
                     onChange={(e) => setStringTuning(s, e.target.value)}
-                    aria-label={`Afinação da ${r + 1}ª corda`}
-                    title={`${r + 1}ª corda`}
+                    aria-label={t.neck.stringTuning(r + 1)}
+                    title={t.neck.stringTitle(r + 1)}
                     className="absolute right-0 w-[34px] -translate-y-1/2 cursor-pointer appearance-none rounded-[3px] bg-transparent text-right font-mono text-[10px] font-bold leading-[14px] text-accent outline-none hover:bg-accent-soft focus-visible:bg-accent-soft"
                     style={{ top: rowY(r) }}
                   >
@@ -210,7 +212,7 @@ export const NeckPanel: React.FC = () => {
                   key={`tone-${m.key}`}
                   type="button"
                   onClick={() => soundEngine.playNote(m.note)}
-                  aria-label={`Tocar ${m.note}`}
+                  aria-label={t.neck.playNote(m.note)}
                   className={cn(
                     'absolute -ml-[9px] -mt-[9px] flex h-[18px] w-[18px] items-center justify-center rounded-full border bg-card font-mono text-[9px] leading-none transition-colors duration-120 hover:border-accent hover:text-accent',
                     m.isRoot ? 'border-muted text-text' : 'border-fret text-muted'
@@ -226,7 +228,7 @@ export const NeckPanel: React.FC = () => {
                   key={`sel-${m.key}`}
                   type="button"
                   onClick={() => soundEngine.playNote(m.note)}
-                  aria-label={`Tocar ${m.note} (voicing)`}
+                  aria-label={t.neck.playVoicingNote(m.note)}
                   className="absolute -ml-2.5 -mt-2.5 flex h-5 w-5 items-center justify-center rounded-full bg-accent font-mono text-[9px] font-bold leading-none text-on-accent shadow-[0_0_0_3px_var(--accent-soft)]"
                   style={{ left: `${m.x}%`, top: m.y }}
                 >

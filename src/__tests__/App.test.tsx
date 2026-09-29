@@ -3,10 +3,12 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import App from '../App';
 import { useChordStore } from '../store/chord-store';
 import { THEME_STORAGE_KEY } from '../lib/theme';
+import { useI18n } from '../i18n';
 
 describe('OpenChords Application Integration', () => {
   beforeEach(() => {
     localStorage.clear();
+    useI18n.getState().setLocale('pt');
     document.documentElement.classList.remove('dark');
     useChordStore.getState().setConstraints({ noBarre: false });
     useChordStore.getState().setChordSymbol('C');

@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { DifficultyPill } from './StatusPill';
 import { TabNotation } from './TabNotation';
 import { MUTE_STROKE, mutePath } from '@/lib/mute-mark';
+import { useT } from '@/i18n';
 
 export interface FretboardDiagramProps {
   voicing: ChordVoicing;
@@ -37,6 +38,7 @@ export const FretboardDiagram: React.FC<FretboardDiagramProps> = ({
   onStrum,
   className = '',
 }) => {
+  const t = useT();
   const numStrings = voicing.frets.length;
   const startFret = voicing.baseFret > 1 ? voicing.baseFret : 1;
 
@@ -92,7 +94,7 @@ export const FretboardDiagram: React.FC<FretboardDiagramProps> = ({
           height={VIEW_H}
           viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
           role="img"
-          aria-label={`Diagrama de acorde ${voicing.rootNote} tablatura ${voicing.tabString}`}
+          aria-label={t.diagram.label(voicing.rootNote, voicing.tabString)}
           className="overflow-visible font-mono"
         >
           {startFret > 1 && (

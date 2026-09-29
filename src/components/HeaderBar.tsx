@@ -5,6 +5,7 @@ import { soundEngine } from '../audio/sound-engine';
 import { applyTheme, getInitialTheme, saveTheme, type Theme } from '@/lib/theme';
 import { cn } from '@/lib/utils';
 import { LogoMark } from './LogoMark';
+import { LOCALES, MESSAGES, useI18n, useT, type Locale } from '@/i18n';
 
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
 
@@ -20,6 +21,8 @@ export const HeaderBar: React.FC<{ onMenuClick?: () => void }> = ({ onMenuClick 
     setIsLeftHanded,
     setChordSymbol,
   } = useChordStore();
+  const t = useT();
+  const { locale, setLocale } = useI18n();
 
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
   const [searchInput, setSearchInput] = useState('');
@@ -83,7 +86,7 @@ export const HeaderBar: React.FC<{ onMenuClick?: () => void }> = ({ onMenuClick 
         type="button"
         onClick={onMenuClick}
         className={cn(iconButtonClass, 'lg:hidden')}
-        aria-label="Abrir seleção de acorde"
+        aria-label={t.header.openChordSelection}
       >
         <Menu className="h-4 w-4" />
       </button>
@@ -113,7 +116,7 @@ export const HeaderBar: React.FC<{ onMenuClick?: () => void }> = ({ onMenuClick 
         type="button"
         onClick={() => setSearchOpen(true)}
         className={cn(iconButtonClass, 'md:hidden')}
-        aria-label="Abrir busca"
+        aria-label={t.header.openSearch}
       >
         <Search className="h-4 w-4" />
       </button>
@@ -136,7 +139,7 @@ export const HeaderBar: React.FC<{ onMenuClick?: () => void }> = ({ onMenuClick 
             type="text"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="Busca rápida (ex: F#m7, Bb9)"
+            placeholder={t.header.searchPlaceholder}
             className="h-9 w-full rounded-oc border border-line bg-bg pl-8 pr-10 text-[13px] lg:pr-16 text-text placeholder:text-muted transition-colors duration-120 hover:border-muted focus:border-accent focus:outline-none"
           />
           {searchInput ? (
@@ -144,7 +147,7 @@ export const HeaderBar: React.FC<{ onMenuClick?: () => void }> = ({ onMenuClick 
               type="submit"
               className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-chip bg-accent px-2 py-0.5 text-xs font-semibold text-on-accent hover:brightness-110"
             >
-              Ir
+              {t.header.go}
             </button>
           ) : (
             <span className="pointer-events-none absolute right-2.5 top-1/2 hidden -translate-y-1/2 items-center gap-1 lg:flex">
@@ -161,7 +164,7 @@ export const HeaderBar: React.FC<{ onMenuClick?: () => void }> = ({ onMenuClick 
           type="button"
           onClick={closeSearch}
           className={cn(iconButtonClass, 'md:hidden')}
-          aria-label="Fechar busca"
+          aria-label={t.header.closeSearch}
         >
           <X className="h-4 w-4" />
         </button>
@@ -176,19 +179,37 @@ export const HeaderBar: React.FC<{ onMenuClick?: () => void }> = ({ onMenuClick 
           iconButtonClass,
           isLeftHanded && 'border-accent bg-accent-soft text-accent hover:border-accent hover:text-accent'
         )}
-        title="Modo canhoto (inverte a ordem das cordas no diagrama)"
-        aria-label="Modo Canhoto"
+        title={t.header.leftHandedTitle}
+        aria-label={t.header.leftHandedLabel}
       >
         <Hand className="h-4 w-4" />
       </button>
+
+      {/* Language: the visible code sits under a transparent native select */}
+      <label className={cn(iconButtonClass, 'relative cursor-pointer font-mono text-[11px] font-medium focus-within:border-accent')}>
+        <span aria-hidden>{locale.toUpperCase()}</span>
+        <select
+          value={locale}
+          onChange={(e) => setLocale(e.target.value as Locale)}
+          aria-label={t.header.language}
+          title={t.header.language}
+          className="absolute inset-0 cursor-pointer appearance-none opacity-0"
+        >
+          {LOCALES.map((l) => (
+            <option key={l} value={l}>
+              {MESSAGES[l].meta.languageName}
+            </option>
+          ))}
+        </select>
+      </label>
 
       {/* Theme Toggle */}
       <button
         type="button"
         onClick={toggleTheme}
         className={iconButtonClass}
-        title={theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'}
-        aria-label="Alternar tema"
+        title={theme === 'dark' ? t.header.themeToLight : t.header.themeToDark}
+        aria-label={t.header.toggleTheme}
       >
         {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
       </button>
@@ -199,11 +220,11 @@ export const HeaderBar: React.FC<{ onMenuClick?: () => void }> = ({ onMenuClick 
         onClick={handlePlaySelected}
         disabled={!selectedVoicing || isPlaying}
         className="flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-oc bg-accent text-sm font-semibold text-on-accent transition-[filter,transform] duration-120 hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:px-4"
-        title="Dedilhar acorde selecionado (strumming)"
-        aria-label="Dedilhar Acorde"
+        title={t.header.strumTitle}
+        aria-label={t.header.strumLabel}
       >
         <Volume2 className={cn('h-4 w-4', isPlaying && 'animate-bounce')} />
-        <span className="hidden sm:inline">Dedilhar</span>
+        <span className="hidden sm:inline">{t.header.strum}</span>
       </button>
     </header>
   );

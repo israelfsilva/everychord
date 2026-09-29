@@ -1,10 +1,13 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { FretboardDiagram } from '../FretboardDiagram';
 import { solveChords } from '../../core/chord-solver';
 import { STANDARD_GUITAR } from '../../core/fretboard';
+import { useI18n } from '../../i18n';
 
 describe('FretboardDiagram Component', () => {
+  beforeEach(() => useI18n.getState().setLocale('pt'));
+
   const voicingsC = solveChords('C', STANDARD_GUITAR, { allowInversions: false });
   const openC = voicingsC.find((v) => v.tabString === 'X32010')!;
 

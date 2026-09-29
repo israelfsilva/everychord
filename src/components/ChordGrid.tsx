@@ -5,6 +5,7 @@ import { soundEngine } from '../audio/sound-engine';
 import { FretboardDiagram } from './FretboardDiagram';
 import { FilterBar } from './FilterBar';
 import type { ChordVoicing } from '../core/types';
+import { useT } from '@/i18n';
 
 export const ChordGrid: React.FC = () => {
   const {
@@ -15,6 +16,7 @@ export const ChordGrid: React.FC = () => {
     selectVoicing,
     setConstraints,
   } = useChordStore();
+  const t = useT();
 
   const handleStrum = (voicing: ChordVoicing) => {
     selectVoicing(voicing.id);
@@ -28,7 +30,7 @@ export const ChordGrid: React.FC = () => {
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="flex h-12 shrink-0 items-center gap-2.5 border-b border-line px-(--pad)">
-        <h2 className="eyebrow shrink-0">Diagramas</h2>
+        <h2 className="eyebrow shrink-0">{t.grid.diagrams}</h2>
         <span className="shrink-0 rounded-[3px] bg-raised px-1.5 py-0.5 font-mono text-[10px] text-muted">
           {voicings.length}
         </span>
@@ -44,10 +46,10 @@ export const ChordGrid: React.FC = () => {
             </div>
             <div>
               <p className="text-sm font-medium text-text">
-                Nenhuma posição encontrada com os filtros atuais
+                {t.grid.emptyTitle}
               </p>
               <p className="mt-1 text-xs text-muted">
-                Tente aumentar a distância de casas (fret span) ou permitir pestanas.
+                {t.grid.emptyHint}
               </p>
             </div>
             <button
@@ -56,7 +58,7 @@ export const ChordGrid: React.FC = () => {
               className="mt-2 flex items-center gap-1.5 rounded-oc border border-line bg-card px-3 py-1.5 text-xs font-medium text-text transition-colors duration-120 hover:border-muted"
             >
               <RotateCcw className="h-3.5 w-3.5" />
-              <span>Restaurar Filtros Padrão</span>
+              <span>{t.grid.restoreDefaults}</span>
             </button>
           </div>
         ) : (

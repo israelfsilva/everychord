@@ -4,16 +4,9 @@ import { ChevronDown, RotateCcw } from 'lucide-react';
 import { DEFAULT_CONSTRAINTS, useChordStore } from '../store/chord-store';
 import type { SearchConstraints } from '../core/types';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n';
 
-type ToggleKey = 'noBarre' | 'easyOnly' | 'omit5' | 'omit3' | 'allowInversions';
-
-const FILTER_TOGGLES: { key: ToggleKey; label: string; title: string }[] = [
-  { key: 'noBarre', label: 'Sem pestanas', title: 'Sem Pestanas' },
-  { key: 'easyOnly', label: 'Easy', title: 'Easy Chords' },
-  { key: 'omit5', label: 'Omit 5ª', title: 'Omitir 5ª (Omit 5th)' },
-  { key: 'omit3', label: 'Omit 3ª', title: 'Omitir 3ª (Omit 3rd)' },
-  { key: 'allowInversions', label: 'Inversões', title: 'Permitir Inversões (Slash Chords)' },
-];
+const FILTER_TOGGLES = ['noBarre', 'easyOnly', 'omit5', 'omit3', 'allowInversions'] as const;
 
 interface SliderFilterProps {
   label: string;
@@ -69,6 +62,7 @@ const SliderFilter: React.FC<SliderFilterProps> = ({ label, value, display, min,
 
 export const FilterBar: React.FC<{ className?: string }> = ({ className }) => {
   const { constraints, setConstraints } = useChordStore();
+  const t = useT();
   const maxSpan = constraints.maxSpan ?? 4;
   const upToFret = constraints.upToFret ?? 15;
 
@@ -79,17 +73,17 @@ export const FilterBar: React.FC<{ className?: string }> = ({ className }) => {
   return (
     <div className={cn('flex items-center gap-1.5 text-xs', className)}>
       <SliderFilter
-        label="Distância"
+        label={t.filters.span}
         value={maxSpan}
-        display={`${maxSpan} casas`}
+        display={t.filters.spanValue(maxSpan)}
         min={3}
         max={5}
         onChange={(v) => setConstraints({ maxSpan: v })}
       />
       <SliderFilter
-        label="Até a casa"
+        label={t.filters.upToFret}
         value={upToFret}
-        display={`${upToFret}ª`}
+        display={t.filters.upToFretValue(upToFret)}
         min={10}
         max={24}
         onChange={(v) => setConstraints({ upToFret: v })}
@@ -97,7 +91,8 @@ export const FilterBar: React.FC<{ className?: string }> = ({ className }) => {
 
       <span className="mx-1 h-[18px] w-px shrink-0 bg-line" aria-hidden />
 
-      {FILTER_TOGGLES.map(({ key, label, title }) => {
+      {FILTER_TOGGLES.map((key) => {
+        const { label, title } = t.filters.toggles[key];
         const on = Boolean(constraints[key]);
         return (
           <button
@@ -122,8 +117,8 @@ export const FilterBar: React.FC<{ className?: string }> = ({ className }) => {
         type="button"
         onClick={() => setConstraints(DEFAULT_CONSTRAINTS)}
         disabled={isDefault}
-        title="Padrão (resetar filtros)"
-        aria-label="Resetar filtros"
+        title={t.filters.resetTitle}
+        aria-label={t.filters.resetLabel}
         className="flex h-7 w-7 shrink-0 items-center justify-center rounded-oc text-muted transition-colors duration-120 hover:text-text disabled:opacity-40 disabled:hover:text-muted"
       >
         <RotateCcw className="h-3.5 w-3.5" />

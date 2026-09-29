@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n';
 
 export type StatusTone = 'success' | 'warning' | 'danger' | 'neutral';
 
@@ -32,20 +33,21 @@ export const StatusPill: React.FC<StatusPillProps> = ({ tone, children, title, c
   </span>
 );
 
-function getDifficulty(score: number): { label: string; tone: StatusTone } {
-  if (score <= 15) return { label: 'Fácil', tone: 'success' };
-  if (score <= 25) return { label: 'Média', tone: 'warning' };
-  return { label: 'Difícil', tone: 'danger' };
+function getDifficulty(score: number): { level: 'easy' | 'medium' | 'hard'; tone: StatusTone } {
+  if (score <= 15) return { level: 'easy', tone: 'success' };
+  if (score <= 25) return { level: 'medium', tone: 'warning' };
+  return { level: 'hard', tone: 'danger' };
 }
 
 export const DifficultyPill: React.FC<{ score: number; className?: string }> = ({
   score,
   className,
 }) => {
-  const { label, tone } = getDifficulty(score);
+  const t = useT();
+  const { level, tone } = getDifficulty(score);
   return (
-    <StatusPill tone={tone} title={`Score de dificuldade: ${score}`} className={className}>
-      {label}
+    <StatusPill tone={tone} title={t.difficulty.scoreTitle(score)} className={className}>
+      {t.difficulty[level]}
     </StatusPill>
   );
 };

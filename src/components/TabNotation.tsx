@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n';
 
 /**
  * Tablature with one fixed-width cell per string, so frets >= 10 ("X(15)(14)…")
@@ -11,13 +12,14 @@ export const TabNotation: React.FC<{
   size?: 'sm' | 'lg';
   className?: string;
 }> = ({ frets, size = 'sm', className }) => {
+  const t = useT();
   const label = frets.map((f) => (f === -1 ? 'X' : f)).join(' ');
   const hasTwoDigits = frets.some((f) => f >= 10);
 
   if (!hasTwoDigits) {
     return (
       <span
-        aria-label={`Tablatura ${label}`}
+        aria-label={t.diagram.tab(label)}
         className={cn(
           'font-mono font-medium whitespace-nowrap text-text',
           size === 'lg' ? 'text-[22px] tracking-[0.14em]' : 'text-[13px] tracking-[0.16em]',
@@ -31,7 +33,7 @@ export const TabNotation: React.FC<{
 
   return (
     <span
-      aria-label={`Tablatura ${label}`}
+      aria-label={t.diagram.tab(label)}
       className={cn(
         'flex font-mono font-medium whitespace-nowrap text-text',
         size === 'lg' ? 'gap-1 text-[18px]' : 'gap-px text-[12px]',

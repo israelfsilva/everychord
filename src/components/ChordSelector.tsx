@@ -5,9 +5,7 @@ import { cn } from '@/lib/utils';
 import { SectionTitle } from './SectionTitle';
 import { DifficultyPill } from './StatusPill';
 import { TabNotation } from './TabNotation';
-
-// Short family labels for the Sufixo column
-const FAMILY_LABELS = ['Maior', 'Menor', 'Dom', 'Sus'];
+import { useT } from '@/i18n';
 
 const findFamily = (modifier: string): number =>
   MODIFIER_GROUPS.findIndex((g) => g.modifiers.some((m) => m.value === modifier));
@@ -35,6 +33,7 @@ export const ChordSelector: React.FC = () => {
     setRoot,
     setModifier,
   } = useChordStore();
+  const t = useT();
 
   // Family being browsed; follows the active modifier when it changes (e.g. via search)
   const [familyIdx, setFamilyIdx] = useState(() => Math.max(0, findFamily(modifier)));
@@ -61,7 +60,7 @@ export const ChordSelector: React.FC = () => {
     <div className="flex h-full flex-col gap-(--sec) overflow-y-auto p-(--pad) select-none">
       {/* Acorde: compact card */}
       <section
-        aria-label="Acorde"
+        aria-label={t.selector.chord}
         className="flex shrink-0 items-center gap-3.5 rounded-oc border border-line bg-card px-3.5 py-3"
       >
         <span className="max-w-[45%] truncate font-mono text-[32px] font-medium leading-none text-accent">
@@ -75,13 +74,13 @@ export const ChordSelector: React.FC = () => {
         <span className="ml-auto shrink-0 text-right font-mono text-[10px] leading-[1.4] text-muted">
           {voicings.length}
           <br />
-          {voicings.length === 1 ? 'posição' : 'posições'}
+          {t.selector.positions(voicings.length)}
         </span>
       </section>
 
       {/* Fundamental */}
       <section className="flex shrink-0 flex-col gap-2.5">
-        <SectionTitle label="Fundamental" value={root} />
+        <SectionTitle label={t.selector.root} value={root} />
         <div className="grid grid-cols-6 gap-1.5">
           {CHORD_ROOTS.map((r) => {
             const isActive = root === r;
@@ -107,9 +106,9 @@ export const ChordSelector: React.FC = () => {
 
       {/* Sufixo: family → variation */}
       <section className="flex shrink-0 flex-col gap-2.5">
-        <SectionTitle label="Sufixo" value={`${root} · ${activeModLabel || 'Major'}`} />
+        <SectionTitle label={t.selector.suffix} value={`${root} · ${activeModLabel || 'Major'}`} />
         <div className="grid grid-cols-[104px_minmax(0,1fr)] overflow-hidden rounded-oc border border-line bg-card">
-          <div className="flex flex-col gap-0.5 border-r border-line bg-bg p-1.5" role="group" aria-label="Família">
+          <div className="flex flex-col gap-0.5 border-r border-line bg-bg p-1.5" role="group" aria-label={t.selector.family}>
             {MODIFIER_GROUPS.map((group, idx) => {
               const isActive = familyIdx === idx;
               return (
@@ -118,7 +117,7 @@ export const ChordSelector: React.FC = () => {
                   type="button"
                   onClick={() => setFamilyIdx(idx)}
                   aria-pressed={isActive}
-                  title={group.category}
+                  title={t.selector.families[idx]?.full ?? group.category}
                   className={cn(
                     'flex h-[34px] items-center justify-between rounded-chip px-2.5 text-left text-[13px] transition-colors duration-120',
                     isActive
@@ -126,7 +125,7 @@ export const ChordSelector: React.FC = () => {
                       : 'text-muted hover:text-text'
                   )}
                 >
-                  <span>{FAMILY_LABELS[idx] ?? group.category}</span>
+                  <span>{t.selector.families[idx]?.short ?? group.category}</span>
                   {isActive && (
                     <span aria-hidden className="text-[11px] font-normal text-faint">
                       ›
@@ -137,7 +136,7 @@ export const ChordSelector: React.FC = () => {
             })}
           </div>
 
-          <div className="flex min-w-0 flex-col gap-0.5 p-1.5" role="group" aria-label="Variação">
+          <div className="flex min-w-0 flex-col gap-0.5 p-1.5" role="group" aria-label={t.selector.variation}>
             {MODIFIER_GROUPS[familyIdx].modifiers.map((mod) => {
               const isActive = modifier === mod.value;
               return (
@@ -167,7 +166,7 @@ export const ChordSelector: React.FC = () => {
 
       {/* Voicing */}
       <section className="flex shrink-0 flex-col gap-2.5">
-        <SectionTitle label="Voicing" value={selectedIdx >= 0 ? `#${selectedIdx + 1}` : undefined} />
+        <SectionTitle label={t.selector.voicing} value={selectedIdx >= 0 ? `#${selectedIdx + 1}` : undefined} />
         <div className="flex flex-col gap-[9px] rounded-oc border border-line bg-card px-3.5 py-3">
           {selectedVoicing ? (
             <>
@@ -184,18 +183,18 @@ export const ChordSelector: React.FC = () => {
               </div>
               <div className="flex items-baseline justify-between gap-3 text-xs">
                 <span className="text-muted">
-                  Baixo <span className="font-mono text-text">{selectedVoicing.bassNote}</span>{' '}
+                  {t.selector.bass} <span className="font-mono text-text">{selectedVoicing.bassNote}</span>{' '}
                   {selectedVoicing.isRootInBass ? (
-                    <span className="text-easy">· Fundamental</span>
+                    <span className="text-easy">· {t.selector.rootInBass}</span>
                   ) : (
-                    <span className="text-warn">· Inversão</span>
+                    <span className="text-warn">· {t.selector.inversion}</span>
                   )}
                 </span>
                 <span
                   className="min-w-0 truncate text-muted"
-                  title={equivalentChords.length ? equivalentChords.join(', ') : 'Nenhum equivalente direto'}
+                  title={equivalentChords.length ? equivalentChords.join(', ') : t.selector.noEquivalent}
                 >
-                  Enarm.{' '}
+                  {t.selector.enharmonic}{' '}
                   <span className="font-mono text-text">
                     {equivalentChords.length ? equivalentChords.join(' ') : '—'}
                   </span>
@@ -203,7 +202,7 @@ export const ChordSelector: React.FC = () => {
               </div>
             </>
           ) : (
-            <p className="py-3 text-center text-xs text-muted">Nenhum voicing selecionado</p>
+            <p className="py-3 text-center text-xs text-muted">{t.selector.noVoicing}</p>
           )}
         </div>
       </section>
