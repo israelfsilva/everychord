@@ -58,8 +58,8 @@ describe('FretboardDiagram Component', () => {
     const rightMute = rightContainer.querySelector('[data-testid="marker-mute"]');
     const leftMute = leftContainer.querySelector('[data-testid="marker-mute"]');
 
-    const rightX = Number(rightMute?.getAttribute('x') || rightMute?.getAttribute('cx'));
-    const leftX = Number(leftMute?.getAttribute('x') || leftMute?.getAttribute('cx'));
+    const rightX = Number(rightMute?.getAttribute('data-cx'));
+    const leftX = Number(leftMute?.getAttribute('data-cx'));
 
     // In right-handed mode, string 0 is on the left. In left-handed mode, it should be on the right.
     expect(leftX).toBeGreaterThan(rightX);
@@ -87,6 +87,22 @@ describe('FretboardDiagram Component', () => {
       fireEvent.click(firstFretDot);
       expect(onNoteClick).toHaveBeenCalled();
     }
+  });
+
+  it('renders high-fret tabs as one cell per string instead of a parenthesized string', () => {
+    const high = solveChords('C', STANDARD_GUITAR, { upToFret: 15 }).find((v) =>
+      v.frets.some((f) => f >= 10)
+    )!;
+    render(<FretboardDiagram voicing={high} />);
+
+    const tab = screen.getByLabelText(/^Tablatura /);
+    expect(tab.textContent).not.toContain('(');
+    expect(tab.children.length).toBe(high.frets.length);
+  });
+
+  it('keeps the compact tab for single-digit voicings', () => {
+    render(<FretboardDiagram voicing={openC} />);
+    expect(screen.getByLabelText(/^Tablatura /).textContent).toBe('X32010');
   });
 
   it('triggers onStrum when the diagram is clicked', () => {

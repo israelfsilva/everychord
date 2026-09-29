@@ -9,6 +9,7 @@ describe('OpenChords Application Integration', () => {
     localStorage.clear();
     document.documentElement.classList.remove('dark');
     useChordStore.getState().setConstraints({ noBarre: false });
+    useChordStore.getState().setChordSymbol('C');
   });
 
   it('renders application header, chord selector, diagram grid and console', () => {
@@ -31,10 +32,34 @@ describe('OpenChords Application Integration', () => {
     // Diagram grid
     expect(screen.getAllByLabelText(/Diagrama de acorde/i).length).toBeGreaterThan(0);
 
-    // Bottom console
+    // Sidebar sections and the neck panel
+    expect(screen.getByRole('heading', { level: 2, name: /^Sufixo$/ })).toBeDefined();
     expect(screen.getByRole('heading', { level: 2, name: /^Voicing$/ })).toBeDefined();
-    expect(screen.getByRole('heading', { level: 2, name: /^Afinação$/ })).toBeDefined();
-    expect(screen.getByRole('heading', { level: 2, name: /^Filtros$/ })).toBeDefined();
+    expect(screen.getByRole('heading', { level: 2, name: /^Braço$/ })).toBeDefined();
+    expect(screen.getByLabelText(/Preset de afinação/i)).toBeDefined();
+  });
+
+  it('shows the selected voicing on the neck and updates it on selection', () => {
+    const countSounding = () =>
+      useChordStore.getState().selectedVoicing!.frets.filter((f) => f >= 0).length;
+    render(<App />);
+    expect(screen.getAllByRole('button', { name: /\(voicing\)$/ }).length).toBe(countSounding());
+
+    const cards = screen.getAllByTestId('chord-diagram-card');
+    const other = cards.find((c) => c.getAttribute('aria-pressed') === 'false')!;
+    fireEvent.click(other);
+    expect(other.getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getAllByRole('button', { name: /\(voicing\)$/ }).length).toBe(countSounding());
+  });
+
+  it('keeps the suffix family in sync with a searched chord', () => {
+    render(<App />);
+    const searchInput = screen.getByPlaceholderText(/Busca rápida/i);
+    fireEvent.change(searchInput, { target: { value: 'G7' } });
+    fireEvent.click(screen.getByRole('button', { name: /^Ir$/ }));
+
+    expect(screen.getByRole('button', { name: /^Dom$/ }).getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByRole('button', { name: /^7\s?G7$/ }).getAttribute('aria-pressed')).toBe('true');
   });
 
   it('updates chord when user clicks a different root and modifier', () => {
@@ -102,14 +127,42 @@ describe('OpenChords Application Integration', () => {
     expect(document.activeElement).toBe(searchInput);
   });
 
-  it('updates the no-barre filter through its switch', () => {
+  it('opens the collapsed mobile search and focuses it', () => {
     render(<App />);
-    const noBarreSwitch = screen.getByRole('switch', { name: /Sem Pestanas/i });
+    const searchInput = screen.getByPlaceholderText(/Busca rápida/i);
 
-    fireEvent.click(noBarreSwitch);
+    fireEvent.click(screen.getByRole('button', { name: /Abrir busca/i }));
+    expect(document.activeElement).toBe(searchInput);
+    expect(screen.getByRole('button', { name: /Fechar busca/i })).toBeDefined();
+
+    fireEvent.change(searchInput, { target: { value: 'Em' } });
+    fireEvent.keyDown(searchInput, { key: 'Escape' });
+    expect((searchInput as HTMLInputElement).value).toBe('');
+  });
+
+  it('keeps the left-hand toggle available in the header', () => {
+    render(<App />);
+    const lefty = screen.getByRole('button', { name: /Modo Canhoto/i });
+    expect(lefty.className).not.toMatch(/(^|\s)hidden(\s|$)/);
+  });
+
+  it('updates the no-barre filter through its chip', () => {
+    render(<App />);
+    const noBarreChip = screen.getByRole('button', { name: /^Sem pestanas$/i });
+
+    fireEvent.click(noBarreChip);
     expect(useChordStore.getState().constraints.noBarre).toBe(true);
+    expect(noBarreChip.getAttribute('aria-pressed')).toBe('true');
 
-    fireEvent.click(noBarreSwitch);
+    fireEvent.click(noBarreChip);
     expect(useChordStore.getState().constraints.noBarre).toBe(false);
+  });
+
+  it('retunes a single string from the neck labels', () => {
+    render(<App />);
+    fireEvent.change(screen.getByLabelText(/Afinação da 6ª corda/i), { target: { value: 'D2' } });
+    expect(useChordStore.getState().tuning[0]).toBe('D2');
+    expect(useChordStore.getState().tuningPreset).toBe('custom');
+    useChordStore.getState().setTuningPreset('standard');
   });
 });

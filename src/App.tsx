@@ -1,30 +1,50 @@
+import { useEffect, useState } from 'react';
 import { HeaderBar } from './components/HeaderBar';
 import { ChordSelector } from './components/ChordSelector';
 import { ChordGrid } from './components/ChordGrid';
-import { BottomConsole } from './components/BottomConsole';
+import { NeckPanel } from './components/NeckPanel';
+import { cn } from '@/lib/utils';
 
 export function App() {
-  return (
-    <div className="flex h-screen w-screen flex-col overflow-hidden bg-background text-foreground antialiased">
-      {/* 1. Header Bar */}
-      <HeaderBar />
+  // Below lg the sidebar is an off-canvas drawer
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
-      {/* 2. Main Middle Workspace: Left Chord Selector + Center Diagram Grid */}
-      <main className="flex flex-1 overflow-hidden">
-        {/* Left Column: Root and Modifier Matrix */}
-        <aside className="w-80 shrink-0 overflow-hidden">
+  useEffect(() => {
+    if (!drawerOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setDrawerOpen(false);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [drawerOpen]);
+
+  return (
+    <div className="grid h-dvh w-screen grid-cols-[minmax(0,1fr)] grid-rows-[60px_minmax(0,1fr)_auto] overflow-hidden bg-bg text-[13px] text-text">
+      <HeaderBar onMenuClick={() => setDrawerOpen(true)} />
+
+      <div className="relative grid min-h-0 grid-cols-[minmax(0,1fr)] lg:grid-cols-[320px_minmax(0,1fr)]">
+        {drawerOpen && (
+          <div
+            className="absolute inset-0 z-30 bg-black/40 lg:hidden"
+            onClick={() => setDrawerOpen(false)}
+            aria-hidden
+          />
+        )}
+        <aside
+          className={cn(
+            'absolute inset-y-0 left-0 z-40 w-[320px] max-w-[88vw] border-r border-line bg-surface transition-transform duration-200 ease-out',
+            'lg:static lg:z-auto lg:w-auto lg:max-w-none lg:translate-x-0',
+            drawerOpen ? 'translate-x-0 shadow-2xl lg:shadow-none' : '-translate-x-full'
+          )}
+        >
           <ChordSelector />
         </aside>
 
-        {/* Center: Chord Diagram Grid */}
-        <section className="flex-1 overflow-hidden">
+        <main className="min-h-0 min-w-0">
           <ChordGrid />
-        </section>
-      </main>
+        </main>
+      </div>
 
-      {/* 3. Bottom Studio Console: Tuning Controls, Enharmonics & Ergonomic Filters */}
-      <footer className="shrink-0">
-        <BottomConsole />
+      <footer className="border-t border-line bg-surface px-(--pad) py-3.5">
+        <NeckPanel />
       </footer>
     </div>
   );

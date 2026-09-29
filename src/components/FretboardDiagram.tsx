@@ -2,282 +2,247 @@ import React from 'react';
 import type { ChordVoicing } from '../core/types';
 import { cn } from '@/lib/utils';
 import { DifficultyPill } from './StatusPill';
+import { TabNotation } from './TabNotation';
+import { MUTE_STROKE, mutePath } from '@/lib/mute-mark';
 
 export interface FretboardDiagramProps {
   voicing: ChordVoicing;
+  /** 1-based position shown as "#n" in the corner */
+  index?: number;
   isLeftHanded?: boolean;
   activeStringIndex?: number | null;
   isSelected?: boolean;
-  width?: number;
-  height?: number;
-  /** Rendered size relative to the drawing geometry (scales the whole SVG) */
-  displayScale?: number;
   onNoteClick?: (note: string) => void;
   onStrum?: (voicing: ChordVoicing) => void;
   className?: string;
 }
 
+// Drawing geometry (px): 20px between strings, 25px between frets, 5 frets shown
+const STRING_GAP = 20;
+const FRET_GAP = 25;
+const NUM_FRETS = 5;
+const VIEW_W = 164;
+const VIEW_H = 184;
+const GRID_TOP = 40;
+// The grid sits 6px right of center to leave room for the "3fr" label
+const GRID_CENTER_X = VIEW_W / 2 + 6;
+
 export const FretboardDiagram: React.FC<FretboardDiagramProps> = ({
   voicing,
+  index,
   isLeftHanded = false,
   activeStringIndex = null,
   isSelected = false,
-  width = 180,
-  height = 220,
-  displayScale = 1,
   onNoteClick,
   onStrum,
   className = '',
 }) => {
   const numStrings = voicing.frets.length;
-  const numFrets = 5;
   const startFret = voicing.baseFret > 1 ? voicing.baseFret : 1;
 
-  // Geometry
-  const marginTop = 38;
-  const marginBottom = 24;
-  const marginLeft = 36;
-  const marginRight = 18;
+  const gridWidth = (numStrings - 1) * STRING_GAP;
+  const gridHeight = NUM_FRETS * FRET_GAP;
+  const gridLeft = GRID_CENTER_X - 50;
+  const x0 = gridLeft + (100 - gridWidth) / 2;
 
-  const gridWidth = width - marginLeft - marginRight;
-  const gridHeight = height - marginTop - marginBottom;
+  const getStringX = (s: number): number =>
+    x0 + (isLeftHanded ? numStrings - 1 - s : s) * STRING_GAP;
 
-  const stringSpacing = gridWidth / (numStrings - 1);
-  const fretSpacing = gridHeight / numFrets;
+  const getFretCenterY = (fretNumber: number): number =>
+    GRID_TOP + (fretNumber - startFret + 0.5) * FRET_GAP;
 
-  // Returns X coordinate for a given 0-indexed string index
-  const getStringX = (s: number): number => {
-    if (isLeftHanded) {
-      return marginLeft + (numStrings - 1 - s) * stringSpacing;
-    }
-    return marginLeft + s * stringSpacing;
-  };
+  const strum = () => onStrum?.(voicing);
 
-  // Returns Y coordinate for center of a fret
-  const getFretCenterY = (fretNumber: number): number => {
-    const fOffset = fretNumber - startFret + 1;
-    return marginTop + (fOffset - 0.5) * fretSpacing;
-  };
-
-  const handleDiagramClick = () => {
-    onStrum?.(voicing);
+  const playMarker = (e: React.MouseEvent, s: number) => {
+    e.stopPropagation();
+    const note = voicing.markers?.[s]?.note;
+    if (note) onNoteClick?.(note);
   };
 
   return (
     <div
-      onClick={handleDiagramClick}
+      role="button"
+      tabIndex={0}
+      aria-pressed={isSelected}
+      onClick={strum}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          strum();
+        }
+      }}
       className={cn(
-        'group/diagram relative flex cursor-pointer select-none flex-col rounded-md surface-well p-1 transition-colors duration-200',
-        isSelected && 'border-primary/50!',
+        'flex cursor-pointer select-none flex-col rounded-oc border bg-card transition-[border-color,box-shadow] duration-120 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
+        isSelected
+          ? 'border-accent shadow-[0_0_0_3px_var(--accent-soft)]'
+          : 'border-line hover:border-muted',
         className
       )}
       data-testid="chord-diagram-card"
     >
-      {/* Raised panel holding the diagram; footer sits on the recessed shell */}
-      <div
-        className={cn(
-          'rounded-sm surface-raised p-2 transition-colors duration-200',
-          isSelected ? 'border-primary!' : 'group-hover/diagram:border-muted-foreground/30!'
+      <div className="relative flex h-[184px] justify-center">
+        {index !== undefined && (
+          <span className="pointer-events-none absolute left-3 top-2.5 font-mono text-[10px] text-faint">
+            #{index}
+          </span>
         )}
-      >
+
         <svg
-          width={width * displayScale}
-          height={height * displayScale}
-          viewBox={`0 0 ${width} ${height}`}
+          width={VIEW_W}
+          height={VIEW_H}
+          viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
           role="img"
           aria-label={`Diagrama de acorde ${voicing.rootNote} tablatura ${voicing.tabString}`}
-          className="mx-auto overflow-visible font-mono"
+          className="overflow-visible font-mono"
         >
-          {/* Definitions for Glow Filter */}
-          <defs>
-            <filter id="string-glow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="3" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-          </defs>
-
-          {/* Base Fret Indicator (if > 1) */}
           {startFret > 1 && (
             <text
-              x={marginLeft - 8}
-              y={marginTop + fretSpacing / 2 + 5}
+              x={x0 - 10}
+              y={GRID_TOP + FRET_GAP / 2 + 3.5}
               textAnchor="end"
-              fontSize="12"
-              fontWeight="bold"
-              className="fill-muted-foreground"
+              fontSize="10"
+              className="fill-muted"
               data-testid="base-fret-label"
             >
               {startFret}fr
             </text>
           )}
 
-          {/* Fretboard Background Grid */}
-          {/* Horizontal Fret Lines */}
-          {Array.from({ length: numFrets + 1 }).map((_, f) => {
-            const y = marginTop + f * fretSpacing;
-            const isNut = f === 0 && startFret === 1;
-
+          {/* Fret lines */}
+          {Array.from({ length: NUM_FRETS + 1 }).map((_, f) => {
+            const y = GRID_TOP + f * FRET_GAP;
             return (
               <line
                 key={`fret-${f}`}
-                x1={marginLeft}
-                y1={y}
-                x2={marginLeft + gridWidth}
-                y2={y}
-                className={isNut ? 'stroke-foreground' : 'stroke-muted-foreground/35'}
-                strokeWidth={isNut ? 5 : 1.5}
-                strokeLinecap="round"
+                x1={x0}
+                y1={y + 0.5}
+                x2={x0 + gridWidth + 1}
+                y2={y + 0.5}
+                strokeWidth={1}
+                className="stroke-fret"
               />
             );
           })}
 
-          {/* Vertical String Lines */}
+          {/* Strings */}
           {Array.from({ length: numStrings }).map((_, s) => {
-            const x = getStringX(s);
+            const x = getStringX(s) + 0.5;
             const isActive = activeStringIndex === s;
-            // String thickness: String 0 is thicker (2.4px down to 1.0px)
-            const baseStrokeWidth = 2.4 - (s / (numStrings - 1)) * 1.4;
-
             return (
-              <g key={`string-group-${s}`}>
-                {/* String line */}
-                <line
-                  data-string-index={s}
-                  data-active={isActive ? 'true' : 'false'}
-                  x1={x}
-                  y1={marginTop}
-                  x2={x}
-                  y2={marginTop + gridHeight}
-                  strokeWidth={isActive ? baseStrokeWidth + 2 : baseStrokeWidth}
-                  filter={isActive ? 'url(#string-glow)' : undefined}
-                  className={isActive ? 'stroke-primary-text animate-pulse transition-all' : 'stroke-muted-foreground'}
-                />
-              </g>
+              <line
+                key={`string-${s}`}
+                data-string-index={s}
+                data-active={isActive ? 'true' : 'false'}
+                x1={x}
+                y1={GRID_TOP}
+                x2={x}
+                y2={GRID_TOP + gridHeight}
+                strokeWidth={isActive ? 2 : 1}
+                className={isActive ? 'stroke-accent' : 'stroke-fret'}
+              />
             );
           })}
 
-          {/* Top Markers (O / X above Nut) */}
-          {voicing.frets.map((fret, s) => {
-            const x = getStringX(s);
-            const y = marginTop - 16;
-            const marker = voicing.markers?.[s];
+          {/* Nut (open position) */}
+          {startFret === 1 && (
+            <rect
+              x={x0 - 1}
+              y={GRID_TOP - 2}
+              width={gridWidth + 3}
+              height={4}
+              rx={1}
+              className="fill-text"
+              data-testid="nut"
+            />
+          )}
 
+          {/* Open / muted markers above the nut */}
+          {voicing.frets.map((fret, s) => {
+            const x = getStringX(s) + 0.5;
+            // × and ○ share the same center so they line up regardless of font metrics
+            const y = GRID_TOP - 15.5;
             if (fret === -1) {
-              // Muted string (X)
               return (
-                <text
+                <path
                   key={`marker-${s}`}
-                  x={x}
-                  y={y + 4}
-                  textAnchor="middle"
-                  fontSize="13"
-                  fontWeight="bold"
+                  d={mutePath(x, y)}
+                  strokeWidth={MUTE_STROKE}
+                  strokeLinecap="round"
                   data-testid="marker-mute"
-                  className="fill-muted-foreground select-none"
-                >
-                  ✕
-                </text>
+                  data-cx={x}
+                  className="stroke-muted"
+                />
               );
             }
-
             if (fret === 0) {
-              // Open string (O)
               const isActive = activeStringIndex === s;
               return (
                 <circle
                   key={`marker-${s}`}
                   cx={x}
                   cy={y}
-                  r={5.5}
-                  fill="none"
-                  strokeWidth="1.8"
+                  r={3.75}
+                  fill="transparent"
+                  strokeWidth="1.5"
                   data-testid="marker-open"
-                  className={cn(
-                    'cursor-pointer',
-                    isActive ? 'stroke-primary-text' : 'stroke-foreground'
-                  )}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (marker?.note) onNoteClick?.(marker.note);
-                  }}
+                  className={cn('cursor-pointer', isActive ? 'stroke-accent' : 'stroke-text')}
+                  onClick={(e) => playMarker(e, s)}
                 />
               );
             }
-
             return null;
           })}
 
-          {/* Barre Chords Visual Pill */}
+          {/* Barres */}
           {voicing.barres.map((barre, bIdx) => {
             const y = getFretCenterY(barre.fret);
-            const x1 = getStringX(barre.fromString);
-            const x2 = getStringX(barre.toString);
-            const minX = Math.min(x1, x2);
-            const maxX = Math.max(x1, x2);
-            const pillWidth = maxX - minX + 20;
-
+            const xa = getStringX(barre.fromString);
+            const xb = getStringX(barre.toString);
+            const minX = Math.min(xa, xb);
             return (
               <rect
                 key={`barre-${bIdx}`}
-                x={minX - 10}
-                y={y - 10}
-                width={pillWidth}
-                height={20}
-                rx={10}
+                x={minX - 7}
+                y={y - 7.5}
+                width={Math.abs(xb - xa) + 15}
+                height={15}
+                rx={7.5}
                 data-testid="barre-pill"
-                className="fill-primary transition-all"
+                className="fill-accent"
               />
             );
           })}
 
-          {/* Fretted Dots and Finger Numbers */}
+          {/* Fretted dots with finger numbers */}
           {voicing.frets.map((fret, s) => {
             if (fret <= 0) return null;
-
-            const cx = getStringX(s);
+            const cx = getStringX(s) + 0.5;
             const cy = getFretCenterY(fret);
             const finger = voicing.fingers[s];
-            const marker = voicing.markers?.[s];
-            const isBarreString = voicing.barres.some(
-              (b) => b.fret === fret && s >= b.fromString && s <= b.toString
-            );
             const isActive = activeStringIndex === s;
 
             return (
               <g
                 key={`dot-${s}`}
                 data-testid={`fret-dot-${finger ?? s}`}
-                className="cursor-pointer hover:fill-primary-text"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (marker?.note) onNoteClick?.(marker.note);
-                }}
+                className="cursor-pointer"
+                onClick={(e) => playMarker(e, s)}
               >
                 <circle
                   cx={cx}
                   cy={cy}
-                  r={10}
-                  strokeWidth="1.8"
-                  className={
-                    isActive
-                      ? 'fill-primary-text stroke-foreground'
-                      : isBarreString
-                      ? 'fill-primary stroke-primary'
-                      : 'fill-primary stroke-card'
-                  }
-                  filter={isActive ? 'url(#string-glow)' : undefined}
+                  r={7.5}
+                  className={cn('fill-accent', isActive && 'stroke-accent-soft')}
+                  strokeWidth={isActive ? 6 : 0}
                 />
                 {finger && (
                   <text
                     x={cx}
-                    y={cy + 3.5}
+                    y={cy + 2.8}
                     textAnchor="middle"
-                    fontSize="11"
-                    fontWeight="bold"
-                    className="fill-primary-foreground pointer-events-none select-none"
+                    fontSize="8"
+                    fontWeight="700"
+                    className="pointer-events-none fill-on-accent"
                   >
                     {finger}
                   </text>
@@ -288,12 +253,9 @@ export const FretboardDiagram: React.FC<FretboardDiagramProps> = ({
         </svg>
       </div>
 
-      {/* Card Footer: Tab notation and difficulty */}
-      <div className="flex items-center justify-between px-2.5 pb-1.5 pt-2">
-        <span className="font-mono text-xs font-semibold tracking-[0.12em] text-foreground">
-          {voicing.tabString}
-        </span>
-        <DifficultyPill score={voicing.difficultyScore} />
+      <div className="flex items-center justify-between gap-2 border-t border-line-soft px-3 py-2.5">
+        <TabNotation frets={voicing.frets} className="min-w-0" />
+        <DifficultyPill score={voicing.difficultyScore} className="shrink-0" />
       </div>
     </div>
   );

@@ -238,7 +238,7 @@ function computeVoicingsWithCache(
   }
 }
 
-const defaultConstraints: SearchConstraints = {
+export const DEFAULT_CONSTRAINTS: SearchConstraints = {
   maxSpan: 4,
   upToFret: 15,
   omit5: false,
@@ -257,7 +257,7 @@ const initialTuning = STANDARD_GUITAR;
 const initialVoicings = computeVoicingsWithCache(
   initialSymbol,
   initialTuning,
-  defaultConstraints
+  DEFAULT_CONSTRAINTS
 );
 
 const initialSelectedVoicing =
@@ -274,7 +274,7 @@ export const useChordStore = create<ChordState>((set, get) => ({
   tuningPreset: 'standard',
   tuning: initialTuning,
 
-  constraints: defaultConstraints,
+  constraints: DEFAULT_CONSTRAINTS,
   isLeftHanded: false,
 
   voicings: initialVoicings,

@@ -3,11 +3,11 @@ import { cn } from '@/lib/utils';
 
 export type StatusTone = 'success' | 'warning' | 'danger' | 'neutral';
 
-const TONE_CLASSES: Record<StatusTone, { text: string; dot: string }> = {
-  success: { text: 'text-success', dot: 'bg-success' },
-  warning: { text: 'text-warning', dot: 'bg-warning' },
-  danger: { text: 'text-destructive', dot: 'bg-destructive' },
-  neutral: { text: 'text-muted-foreground', dot: 'bg-muted-foreground' },
+const TONE_CLASSES: Record<StatusTone, { chip: string; dot: string }> = {
+  success: { chip: 'text-easy bg-easy-bg', dot: 'bg-easy' },
+  warning: { chip: 'text-warn bg-warn-bg', dot: 'bg-warn' },
+  danger: { chip: 'text-hard bg-hard-bg', dot: 'bg-hard' },
+  neutral: { chip: 'text-muted bg-raised', dot: 'bg-muted' },
 };
 
 interface StatusPillProps {
@@ -17,17 +17,17 @@ interface StatusPillProps {
   className?: string;
 }
 
-/** Rounded status badge with a colored dot, like the reference's Success / Pending / Refunded. */
+/** Soft status chip with a colored dot (e.g. "Fácil"). */
 export const StatusPill: React.FC<StatusPillProps> = ({ tone, children, title, className }) => (
   <span
     title={title}
     className={cn(
-      'inline-flex items-center gap-1.5 rounded-sm border border-border bg-muted px-2 py-0.5 text-[11px] font-medium whitespace-nowrap',
-      TONE_CLASSES[tone].text,
+      'inline-flex items-center gap-[5px] rounded-chip px-2 py-[3px] text-[11px] leading-none whitespace-nowrap',
+      TONE_CLASSES[tone].chip,
       className
     )}
   >
-    <span className={cn('h-1.5 w-1.5 shrink-0 rounded-full', TONE_CLASSES[tone].dot)} />
+    <span className={cn('h-[5px] w-[5px] shrink-0 rounded-full', TONE_CLASSES[tone].dot)} />
     {children}
   </span>
 );
