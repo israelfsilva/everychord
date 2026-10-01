@@ -1,0 +1,8 @@
+{
+  // Cloudflare Worker serving the static Vite build (no server code yet)
+  "name": "everychord",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist"
+  }
+}
