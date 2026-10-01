@@ -21,7 +21,7 @@ export function App() {
     <div className="grid h-dvh w-screen grid-cols-[minmax(0,1fr)] grid-rows-[60px_minmax(0,1fr)_auto_auto] overflow-hidden bg-bg text-[13px] text-text">
       <HeaderBar onMenuClick={() => setDrawerOpen(true)} />
 
-      <div className="relative grid min-h-0 grid-cols-[minmax(0,1fr)] lg:grid-cols-[320px_minmax(0,1fr)]">
+      <div className="relative grid min-h-0 grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,1fr)] lg:grid-cols-[320px_minmax(0,1fr)]">
         {drawerOpen && (
           <div
             className="absolute inset-0 z-30 bg-black/40 lg:hidden"
@@ -32,7 +32,7 @@ export function App() {
         <aside
           className={cn(
             'absolute inset-y-0 left-0 z-40 w-[320px] max-w-[88vw] border-r border-line bg-surface transition-transform duration-200 ease-out',
-            'lg:static lg:z-auto lg:w-auto lg:max-w-none lg:translate-x-0',
+            'lg:static lg:z-auto lg:min-h-0 lg:w-auto lg:max-w-none lg:translate-x-0',
             drawerOpen ? 'translate-x-0 shadow-2xl lg:shadow-none' : '-translate-x-full'
           )}
         >
