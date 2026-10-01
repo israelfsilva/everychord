@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Volume2, Hand, Search, Sun, Moon, Menu, X } from 'lucide-react';
+import { Hand, Search, Sun, Moon, Menu, X } from 'lucide-react';
 import { useChordStore } from '../store/chord-store';
 import { soundEngine } from '../audio/sound-engine';
 import { applyTheme, getInitialTheme, saveTheme, type Theme } from '@/lib/theme';
 import { cn } from '@/lib/utils';
 import { LogoMark } from './LogoMark';
+import { StrumIcon } from './StrumIcon';
 import { LOCALES, MESSAGES, useI18n, useT, type Locale } from '@/i18n';
 
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
@@ -73,10 +74,13 @@ export const HeaderBar: React.FC<{ onMenuClick?: () => void }> = ({ onMenuClick 
     }
   };
 
+  // Bumped on each strum to remount StrumIcon and replay its animation
+  const [strumCount, setStrumCount] = useState(0);
+
   const handlePlaySelected = () => {
-    if (selectedVoicing) {
-      soundEngine.strumChord(selectedVoicing);
-    }
+    if (!selectedVoicing || isPlaying) return;
+    setStrumCount((n) => n + 1);
+    soundEngine.strumChord(selectedVoicing);
   };
 
   return (
@@ -218,12 +222,12 @@ export const HeaderBar: React.FC<{ onMenuClick?: () => void }> = ({ onMenuClick 
       <button
         type="button"
         onClick={handlePlaySelected}
-        disabled={!selectedVoicing || isPlaying}
+        disabled={!selectedVoicing}
         className="flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-oc bg-accent text-sm font-semibold text-on-accent transition-[filter,transform] duration-120 hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:px-4"
         title={t.header.strumTitle}
         aria-label={t.header.strumLabel}
       >
-        <Volume2 className={cn('h-4 w-4', isPlaying && 'animate-bounce')} />
+        <StrumIcon key={strumCount} animate={strumCount > 0} className="h-4 w-4" />
         <span className="hidden sm:inline">{t.header.strum}</span>
       </button>
     </header>
