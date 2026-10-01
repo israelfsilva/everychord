@@ -2,7 +2,7 @@
 
 > Every way to play a chord on guitar or bass, in any tuning. See the diagrams, hear each voicing, and pick the one that fits your hand best.
 
-**Try it:** https://israelfsilva.github.io/everychord/
+**Try it:** https://everychord.org/
 
 Inspired by the classic "Billion Chords".
 
