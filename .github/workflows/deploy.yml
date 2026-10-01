@@ -1,4 +1,4 @@
-name: Deploy OpenChords to GitHub Pages
+name: Deploy EveryChord to GitHub Pages
 
 on:
   push:

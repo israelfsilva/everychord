@@ -1,7 +1,7 @@
 export type Theme = 'light' | 'dark';
 
 // Keep in sync with the inline script in index.html
-export const THEME_STORAGE_KEY = 'openchords-theme';
+export const THEME_STORAGE_KEY = 'everychord-theme';
 
 export function getInitialTheme(): Theme {
   try {

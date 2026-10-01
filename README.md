@@ -1,12 +1,12 @@
-# OpenChords
+# EveryChord
 
 > Every way to play a chord on guitar or bass, in any tuning. See the diagrams, hear each voicing, and pick the one that fits your hand best.
 
-**Try it:** https://israelfsilva.github.io/openchords/
+**Try it:** https://israelfsilva.github.io/everychord/
 
 Inspired by the classic "Billion Chords".
 
-![OpenChords screenshot](docs/screenshot.png)
+![EveryChord screenshot](docs/screenshot.png)
 
 ---
 

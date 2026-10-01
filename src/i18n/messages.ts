@@ -85,7 +85,7 @@ export interface Messages {
 const pt: Messages = {
   meta: {
     htmlLang: 'pt-BR',
-    title: 'OpenChords • Acordes para violão, guitarra e baixo',
+    title: 'EveryChord • Acordes para violão, guitarra e baixo',
     languageName: 'Português',
   },
   header: {
@@ -178,7 +178,7 @@ const pt: Messages = {
 const en: Messages = {
   meta: {
     htmlLang: 'en',
-    title: 'OpenChords • Guitar and bass chords in any tuning',
+    title: 'EveryChord • Guitar and bass chords in any tuning',
     languageName: 'English',
   },
   header: {
@@ -271,7 +271,7 @@ const en: Messages = {
 const es: Messages = {
   meta: {
     htmlLang: 'es',
-    title: 'OpenChords • Acordes para guitarra y bajo',
+    title: 'EveryChord • Acordes para guitarra y bajo',
     languageName: 'Español',
   },
   header: {

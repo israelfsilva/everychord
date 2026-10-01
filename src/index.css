@@ -11,7 +11,7 @@
     --font-heading: var(--font-sans);
     --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 
-    /* OpenChords tokens (see handoff openchords-theme.css) */
+    /* EveryChord tokens (see handoff openchords-theme.css) */
     --color-bg: var(--bg);
     --color-surface: var(--surface);
     --color-card: var(--card);

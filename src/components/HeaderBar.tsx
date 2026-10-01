@@ -97,7 +97,7 @@ export const HeaderBar: React.FC<{ onMenuClick?: () => void }> = ({ onMenuClick 
           <LogoMark className="h-6 w-6" />
         </div>
         <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-2.5 text-sm">
-          <h1 className="sr-only text-muted md:not-sr-only">OpenChords</h1>
+          <h1 className="sr-only text-muted md:not-sr-only">EveryChord</h1>
           <span className="hidden text-faint md:inline" aria-hidden>›</span>
           <span
             className="max-w-[9ch] shrink-0 truncate font-mono font-medium text-accent sm:max-w-[12ch]"

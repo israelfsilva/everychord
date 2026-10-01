@@ -5,7 +5,7 @@ import { useChordStore } from '../store/chord-store';
 import { THEME_STORAGE_KEY } from '../lib/theme';
 import { useI18n } from '../i18n';
 
-describe('OpenChords Application Integration', () => {
+describe('EveryChord Application Integration', () => {
   beforeEach(() => {
     localStorage.clear();
     useI18n.getState().setLocale('pt');
@@ -19,8 +19,7 @@ describe('OpenChords Application Integration', () => {
 
     // Header title
     const heading = screen.getByRole('heading', { level: 1 });
-    expect(heading.textContent).toContain('Open');
-    expect(heading.textContent).toContain('Chords');
+    expect(heading.textContent).toContain('EveryChord');
 
     // Search bar
     expect(

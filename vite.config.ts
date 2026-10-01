@@ -4,7 +4,7 @@ import react from "@vitejs/plugin-react"
 import tailwindcss from "@tailwindcss/vite"
 
 export default defineConfig({
-  base: process.env.NODE_ENV === 'production' ? '/openchords/' : '/',
+  base: process.env.NODE_ENV === 'production' ? '/everychord/' : '/',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {

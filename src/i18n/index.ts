@@ -3,7 +3,7 @@ import { LOCALES, MESSAGES, type Locale, type Messages } from './messages';
 
 export { LOCALES, MESSAGES, type Locale, type Messages };
 
-export const LOCALE_STORAGE_KEY = 'openchords-locale';
+export const LOCALE_STORAGE_KEY = 'everychord-locale';
 
 const isLocale = (value: unknown): value is Locale =>
   typeof value === 'string' && (LOCALES as string[]).includes(value);

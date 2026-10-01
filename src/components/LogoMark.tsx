@@ -1,7 +1,7 @@
 import React, { useId } from 'react';
 
 /**
- * OpenChords mark: a tilted acoustic guitar in currentColor (sound hole and bridge are cut out).
+ * EveryChord mark: a tilted acoustic guitar in currentColor (sound hole and bridge are cut out).
  * Keep in sync with public/favicon.svg, which draws the same geometry on the accent tile.
  */
 export const LogoMark: React.FC<{ className?: string }> = ({ className }) => {
