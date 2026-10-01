@@ -80,6 +80,13 @@ export interface Messages {
     label: (root: string, tab: string) => string;
     tab: (tab: string) => string;
   };
+  footer: {
+    madeWith: string;
+    music: string;
+    by: string;
+    sourceCode: string;
+    license: string;
+  };
 }
 
 const pt: Messages = {
@@ -172,6 +179,13 @@ const pt: Messages = {
   diagram: {
     label: (root, tab) => `Diagrama de acorde ${root} tablatura ${tab}`,
     tab: (tab) => `Tablatura ${tab}`,
+  },
+  footer: {
+    madeWith: 'Feito com',
+    music: 'música',
+    by: 'por',
+    sourceCode: 'Código no GitHub',
+    license: 'Licença MIT',
   },
 };
 
@@ -266,6 +280,13 @@ const en: Messages = {
     label: (root, tab) => `${root} chord diagram, tab ${tab}`,
     tab: (tab) => `Tab ${tab}`,
   },
+  footer: {
+    madeWith: 'Made with',
+    music: 'music',
+    by: 'by',
+    sourceCode: 'Source on GitHub',
+    license: 'MIT License',
+  },
 };
 
 const es: Messages = {
@@ -358,6 +379,13 @@ const es: Messages = {
   diagram: {
     label: (root, tab) => `Diagrama del acorde ${root}, tablatura ${tab}`,
     tab: (tab) => `Tablatura ${tab}`,
+  },
+  footer: {
+    madeWith: 'Hecho con',
+    music: 'música',
+    by: 'por',
+    sourceCode: 'Código en GitHub',
+    license: 'Licencia MIT',
   },
 };
 

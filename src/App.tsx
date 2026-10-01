@@ -3,6 +3,7 @@ import { HeaderBar } from './components/HeaderBar';
 import { ChordSelector } from './components/ChordSelector';
 import { ChordGrid } from './components/ChordGrid';
 import { NeckPanel } from './components/NeckPanel';
+import { SiteFooter } from './components/SiteFooter';
 import { cn } from '@/lib/utils';
 
 export function App() {
@@ -17,7 +18,7 @@ export function App() {
   }, [drawerOpen]);
 
   return (
-    <div className="grid h-dvh w-screen grid-cols-[minmax(0,1fr)] grid-rows-[60px_minmax(0,1fr)_auto] overflow-hidden bg-bg text-[13px] text-text">
+    <div className="grid h-dvh w-screen grid-cols-[minmax(0,1fr)] grid-rows-[60px_minmax(0,1fr)_auto_auto] overflow-hidden bg-bg text-[13px] text-text">
       <HeaderBar onMenuClick={() => setDrawerOpen(true)} />
 
       <div className="relative grid min-h-0 grid-cols-[minmax(0,1fr)] lg:grid-cols-[320px_minmax(0,1fr)]">
@@ -43,9 +44,11 @@ export function App() {
         </main>
       </div>
 
-      <footer className="border-t border-line bg-surface px-(--pad) py-3.5">
+      <section className="border-t border-line bg-surface px-(--pad) py-3.5">
         <NeckPanel />
-      </footer>
+      </section>
+
+      <SiteFooter />
     </div>
   );
 }
